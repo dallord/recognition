@@ -21,12 +21,14 @@ int main(int argc, char *argv[])
 
     vector<int> vct;
 
-    ifstream file("../../data/outData.txt"); //open data-file
+    ifstream infile("../../data/outData.txt"); //open data-file
 
-    if (file.is_open()){
+    ofstream outfile("../../data/ref_points.txt"); //output file
 
-        while(!file.eof()){
-            file >> ss;
+    if (infile.is_open()){
+
+        while(!infile.eof()){
+            infile >> ss;
             vct.push_back(ss);
         }
 
@@ -35,14 +37,15 @@ int main(int argc, char *argv[])
     }else{
         cout << "Unable to open file" << endl;
     }
-    file.close();
+    infile.close();
 
-    file.open("../../data/outData.txt");
-    while (!file.eof()){
-        getline(file, buff);
+    //count lines (number of seconds) in the file
+    infile.open("../../data/outData.txt");
+    while (!infile.eof()){
+        getline(infile, buff);
         counter++;
     }
-    file.close();
+    infile.close();
 
 
     vector<int> data[counter]; //data array
@@ -67,11 +70,17 @@ int main(int argc, char *argv[])
                 y = i/w;
             }
         }
-        if (max != 8000)
+        if (max != 8000){
             cout << max << ": " << x << " " << y << endl;
-        else cout << "no object" << endl;
-    }
+            outfile << x << " " << y << "\n";
 
+        }
+        else {
+            cout << "no object" << endl;
+            outfile << "-1 -1\n";
+        }
+    }
+    outfile.close();
 
 
     return a.exec();
