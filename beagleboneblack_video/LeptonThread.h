@@ -11,10 +11,15 @@
 
 #include <fstream>
 
+#include <vector>
+
+
 #define PACKET_SIZE 164
 #define PACKET_SIZE_UINT16 (PACKET_SIZE/2)
 #define PACKETS_PER_FRAME 60
 #define FRAME_SIZE_UINT16 (PACKET_SIZE_UINT16*PACKETS_PER_FRAME)
+
+using namespace std;
 
 class LeptonThread : public QThread
 {

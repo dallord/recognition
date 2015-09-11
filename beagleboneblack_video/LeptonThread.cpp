@@ -3,6 +3,7 @@
 #include "Palettes.h"
 #include "SPI.h"
 #include "Lepton_I2C.h"
+#include "learning.h"
 
 #define PACKET_SIZE 164
 #define PACKET_SIZE_UINT16 (PACKET_SIZE/2)
@@ -26,9 +27,49 @@ void LeptonThread::run()
     //open spi port
     SpiOpenPort(0);
 
-    std::ofstream out("../data/outData.txt");
+    ofstream out("../data/outData.txt");
+
+    ifstream infiletrain("../../data/training_set.txt"); //open file with training set
+
+    ofstream outfile("../../data/result.txt"); //output file
 
     int counter = 0;
+    X u; //learning point
+
+    //count number of training vectors
+    string buff;
+    counter_train = 0;
+    while (!infiletrain.eof()){
+        getline(infiletrain, buff);
+        counter_train++;
+    }
+    infiletrain.close();
+
+    counter_train--;
+
+    //init sets and coefficients
+    training_in = new X[counter_train];
+    training_out = new Y[counter_train];
+
+    gam = new float[counter_train];
+    init_gamma();
+    h = 5; //can be other
+
+    init_classes();
+
+    //filling training set
+    infiletrain.open("../../data/training_set.txt");
+    string line;
+    int i = 0;
+    while(!infiletrain.eof()){
+        getline(infiletrain, line);
+        sscanf(line.c_str(), "%d %d %f %f %f",
+               &training_in[i].x, &training_in[i].y,
+               &training_out[i].s0, &training_out[i].s1, &training_out[i].s2);
+        set_type(training_out[i]);
+        i++;
+    }
+    infiletrain.close();
 
    // test();
 
@@ -64,6 +105,7 @@ void LeptonThread::run()
         uint16_t maxValue = 0;
 
         char buf[5];
+        std::vector<int> line; //copy of frameBuffer to line
 
 
         for(int i=0;i<FRAME_SIZE_UINT16;i++) {
@@ -90,10 +132,32 @@ void LeptonThread::run()
             if (counter%27 == 0){
                 sprintf(buf, "%u", frameBuffer[i]);
                 out << buf << " ";
+
+                line.push_back((int)frameBuffer[i]);
             }
         }
 
-        if (counter%27 == 0) out << "\n";
+        if (counter%27 == 0){ //handling the line
+            out << "\n";
+
+            u = find_ref_point(line);
+
+            learning_in = u;
+
+            string classname;
+            int A;
+
+            A = algorithm(learning_in);
+            if (A == 0) classname = "no object";
+            if (A == 1) classname = "standing";
+            if (A == 2) classname = "sitting";
+            if (A == 3) classname = "lying";
+            outfile << learning_in.x << " " << learning_in.y << " = " << classname << endl;
+            outfile.close();
+
+            cout << learning_in.x << " " << learning_in.y << " = " << classname << endl;
+
+        }
 
 
         //qDebug() << minValue <<  " "  << maxValue;
