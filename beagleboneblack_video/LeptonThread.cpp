@@ -16,7 +16,9 @@ LeptonThread::LeptonThread() : QThread()
 }
 
 LeptonThread::~LeptonThread() {
+
 }
+
 
 
 void LeptonThread::run()
@@ -29,25 +31,26 @@ void LeptonThread::run()
 
     ofstream out("../data/outData.txt");
 
-    ifstream infiletrain("../../data/training_set.txt"); //open file with training set
-
-    ofstream outfile("../../data/result.txt"); //output file
+    ofstream outfile("../data/result.txt"); //output file
 
     int counter = 0;
+
     X u; //learning point
 
     //count number of training vectors
+    /*ifstream infiletrain("../data/training_set.txt"); //open file with training set
     string buff;
     counter_train = 0;
-    while (!infiletrain.eof()){
+    while (infiletrain.is_open()){
         getline(infiletrain, buff);
         counter_train++;
     }
     infiletrain.close();
 
-    counter_train--;
+    counter_train--;*/
 
     //init sets and coefficients
+    counter_train = 10;
     training_in = new X[counter_train];
     training_out = new Y[counter_train];
 
@@ -57,8 +60,9 @@ void LeptonThread::run()
 
     init_classes();
 
+
     //filling training set
-    infiletrain.open("../../data/training_set.txt");
+    ifstream infiletrain("../data/training_set.txt");
     string line;
     int i = 0;
     while(!infiletrain.eof()){
@@ -147,15 +151,16 @@ void LeptonThread::run()
             string classname;
             int A;
 
+
             A = algorithm(learning_in);
             if (A == 0) classname = "no object";
             if (A == 1) classname = "standing";
             if (A == 2) classname = "sitting";
             if (A == 3) classname = "lying";
             outfile << learning_in.x << " " << learning_in.y << " = " << classname << endl;
-            outfile.close();
 
-            cout << learning_in.x << " " << learning_in.y << " = " << classname << endl;
+
+            cout << learning_in.x << " " << learning_in.y <<  " = " << classname << endl;
 
         }
 
@@ -166,8 +171,8 @@ void LeptonThread::run()
 
         float diff;
         if (minValue < 7860)
-            diff = 402;//maxValue - minValue;
-        else diff = 300;
+            diff = 512;//maxValue - minValue;
+        else diff = 400;
 
         float scale = 255/diff;
         QRgb color;
@@ -186,10 +191,12 @@ void LeptonThread::run()
         //lets emit the signal for update
         emit updateImage(myImage);
         counter++;
+        line.clear();
 
 
     }
     out.close();
+    outfile.close();
 
     //finally, close SPI port just bcuz
     SpiClosePort(0);

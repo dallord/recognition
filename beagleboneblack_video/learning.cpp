@@ -1,5 +1,16 @@
 #include "learning.h"
 
+int counter_train = 0; //number of pairs in the training set - l
+
+//training pairs
+X* training_in; //list of training vectors - x_i
+Y* training_out; //list of training answers - y_i
+
+X learning_in; //learning point
+Y classes[K];
+
+float* gam; //array of gamma coefficients
+float h; //width of the window
 
 X find_ref_point(vector<int> line){
     X u;
