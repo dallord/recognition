@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 
-#define N 2 //number of components of X vector
+#define N 6 //number of components of X vector
 #define M 3 //number of components of Y vector
 
 #define K 4 //number of classes
@@ -15,8 +15,12 @@
 using namespace std;
 
 struct X{ //input vector of reference point coordinate
-    int x;
-    int y;
+    int x0;
+    int y0;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
 };
 
 struct Y{ //otput vector of states
@@ -40,7 +44,7 @@ extern Y classes[K];
 extern float* gam; //array of gamma coefficients
 extern float h; //width of the window
 
-X find_ref_point(vector<int> line);
+X find_ref_points(vector<int> line);
 
 void init_classes(); //init array of existing classes
 void init_gamma(); //init gamma coefficients

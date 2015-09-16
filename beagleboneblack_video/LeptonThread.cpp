@@ -35,7 +35,7 @@ void LeptonThread::run()
 
     int counter = 0;
 
-    X u; //learning point
+    X u; //learning points
 
     //count number of training vectors
     /*ifstream infiletrain("../data/training_set.txt"); //open file with training set
@@ -50,7 +50,7 @@ void LeptonThread::run()
     counter_train--;*/
 
     //init sets and coefficients
-    counter_train = 10;
+    counter_train = 7;
     training_in = new X[counter_train];
     training_out = new Y[counter_train];
 
@@ -67,8 +67,8 @@ void LeptonThread::run()
     int i = 0;
     while(!infiletrain.eof()){
         getline(infiletrain, line);
-        sscanf(line.c_str(), "%d %d %f %f %f",
-               &training_in[i].x, &training_in[i].y,
+        sscanf(line.c_str(), "%d %d %d %d %d %d %f %f %f",
+               &training_in[i].x0, &training_in[i].y0, &training_in[i].x1, &training_in[i].y1, &training_in[i].x2, &training_in[i].y2,
                &training_out[i].s0, &training_out[i].s1, &training_out[i].s2);
         set_type(training_out[i]);
         i++;
@@ -144,7 +144,7 @@ void LeptonThread::run()
         if (counter%27 == 0){ //handling the line
             out << "\n";
 
-            u = find_ref_point(line);
+            u = find_ref_points(line);
 
             learning_in = u;
 
@@ -157,10 +157,16 @@ void LeptonThread::run()
             if (A == 1) classname = "standing";
             if (A == 2) classname = "sitting";
             if (A == 3) classname = "lying";
-            outfile << learning_in.x << " " << learning_in.y << " = " << classname << endl;
+            outfile << learning_in.x0 << " " << learning_in.y0 << " "
+                    << learning_in.x1 << " " << learning_in.y1 << " "
+                    << learning_in.x2 << " " << learning_in.y2 <<
+                       " = " << classname << endl;
 
 
-            cout << learning_in.x << " " << learning_in.y <<  " = " << classname << endl;
+            cout << learning_in.x0 << " " << learning_in.y0 << " "
+                 << learning_in.x1 << " " << learning_in.y1 << " "
+                 << learning_in.x2 << " " << learning_in.y2 <<
+                    " = " << classname << endl;
 
         }
 

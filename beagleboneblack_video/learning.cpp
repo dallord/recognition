@@ -12,11 +12,42 @@ Y classes[K];
 float* gam; //array of gamma coefficients
 float h; //width of the window
 
-X find_ref_point(vector<int> line){
+X find_ref_points(vector<int> line){
+
+    vector<int> object;
+
     X u;
     int max = 8000;
     int x = 0, y = 0, w = 80;
 
+    int t_x = 0;
+    int t_y = 0;
+    int b = 0;
+
+    int d = 0;
+    int m_dist = 0;
+
+    //second point
+    for (int i = 0; i < line.size(); i++){
+        if (line[i] > max){
+            object.push_back(line[i]);
+        }
+    }
+
+    for (int i = 0; i < object.size(); i++){
+        t_x += object[i]*i%w;
+        t_y += object[i]*i/w;
+        b += object[i];
+    }
+    if (b != 0){
+        u.x1 = t_x/b;
+        u.y1 = t_y/b;
+    } else {
+        u.x1 = 0;
+        u.y1 = 0;
+    }
+
+    //first point
     for (int i = 0; i < line.size(); i++){
         if (line[i] > max){
             max = line[i];
@@ -25,16 +56,31 @@ X find_ref_point(vector<int> line){
         }
     }
     if (max != 8000){
-        u.x = x;
-        u.y = y;
+        u.x0 = x;
+        u.y0 = y;
+        //third point
+        for (int e = 0; e < object.size(); e++) {
+            d = sqrt((float)((e%w - u.x0)*(e%w - u.x0) + (e/w - u.y0)*(e/w - u.y0)));
+            if (d > m_dist){
+                m_dist = d;
+                u.x2 = e%w;
+                u.y2 = e/w;
+            }
+        }
+
     }
     else {
-        u.x = -1;
-        u.y = -1;
+        u.x0 = -1;
+        u.y0 = -1;
+        u.x2 = -1;
+        u.y2 = -1;
     }
+
+    object.clear();
 
     return u;
 }
+
 
 void init_classes(){
 
@@ -71,7 +117,9 @@ void set_type(Y y){
 }
 
 float rho(X u, X x_i){
-    return sqrt((u.x - x_i.x)*(u.x - x_i.x) + (u.y - x_i.y)*(u.y - x_i.y));
+    return sqrt((u.x0 - x_i.x0)*(u.x0 - x_i.x0) + (u.y0 - x_i.y0)*(u.y0 - x_i.y0)
+                + (u.x1 - x_i.x1)*(u.x1 - x_i.x1) + (u.y1 - x_i.y1)*(u.y1 - x_i.y1)
+                + (u.x2 - x_i.x2)*(u.x2 - x_i.x2) + (u.y2 - x_i.y2)*(u.y2 - x_i.y2));
 }
 
 float algorithm(X u){
