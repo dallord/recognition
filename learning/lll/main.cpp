@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iostream>
 
-#define N 2 //number of components of X vector
+#define N 6 //number of components of X vector
 #define M 3 //number of components of Y vector
 
 #define K 4 //number of classes
@@ -12,8 +12,12 @@
 using namespace std;
 
 struct X{ //input vector of reference point coordinate
-    int x;
-    int y;
+    int x0;
+    int y0;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
 };
 
 struct Y{ //otput vector of states
@@ -35,7 +39,7 @@ X* learning_in; //learning set
 Y classes[K];
 
 float** r; //array of distances
-float gam[10]; //array of gamma coefficients
+float gam[7]; //array of gamma coefficients
 float h; //width of the window
 
 void init_classes(){ //init array of existing classes
@@ -73,7 +77,9 @@ void set_type(Y y){
 }
 
 float rho(X u, X x_i){ //distance
-    return sqrt(abs(u.x - x_i.x)*abs(u.x - x_i.x) + abs(u.y - x_i.y)*abs(u.y - x_i.y));
+    return sqrt(abs(u.x0 - x_i.x0)*abs(u.x0 - x_i.x0) + abs(u.y0 - x_i.y0)*abs(u.y0 - x_i.y0)
+                + abs(u.x1 - x_i.x1)*abs(u.x1 - x_i.x1) + abs(u.y1 - x_i.y1)*abs(u.y1 - x_i.y1)
+                + abs(u.x2 - x_i.x2)*abs(u.x2 - x_i.x2) + abs(u.y2 - x_i.y2)*abs(u.y2 - x_i.y2));
 }
 
 void qsort(float rho[], int left, int right){
@@ -174,8 +180,8 @@ int main(int argc, char *argv[])
     int i = 0;
     while(!infiletrain.eof()){
         getline(infiletrain, line);
-        sscanf(line.c_str(), "%d %d %f %f %f",
-               &training_in[i].x, &training_in[i].y,
+        sscanf(line.c_str(), "%d %d %d %d %d %d %f %f %f",
+               &training_in[i].x0, &training_in[i].y0, &training_in[i].x1, &training_in[i].y1, &training_in[i].x2, &training_in[i].y2,
                &training_out[i].s0, &training_out[i].s1, &training_out[i].s2);
         set_type(training_out[i]);
         i++;
@@ -187,8 +193,8 @@ int main(int argc, char *argv[])
     i = 0;
     while(!infilelearn.eof()){
         getline(infilelearn, line);
-        sscanf(line.c_str(), "%d %d",
-               &learning_in[i].x, &learning_in[i].y);
+        sscanf(line.c_str(), "%d %d %d %d %d %d",
+               &learning_in[i].x0, &learning_in[i].y0, &learning_in[i].x1, &learning_in[i].y1, &learning_in[i].x2, &learning_in[i].y2);
         i++;
     }
     infilelearn.close();
@@ -225,7 +231,7 @@ int main(int argc, char *argv[])
         if (A[i] == 1) classname = "standing";
         if (A[i] == 2) classname = "sitting";
         if (A[i] == 3) classname = "lying";
-        outfile << learning_in[i].x << " " << learning_in[i].y << " = " << classname << endl;
+        outfile << learning_in[i].x0 << " " << learning_in[i].y0 << " " << learning_in[i].x1 << " " << learning_in[i].y1 << " " << learning_in[i].x2 << " " << learning_in[i].y2 << " = " << classname << endl;
     }
     outfile.close();
     cout << "Done" << endl;
