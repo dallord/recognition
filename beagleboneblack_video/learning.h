@@ -14,6 +14,12 @@
 
 using namespace std;
 
+struct Point{ //object points
+    int x;
+    int y;
+    int weight;
+};
+
 struct X{ //input vector of reference point coordinate
     int x0;
     int y0;

@@ -14,7 +14,8 @@ float h; //width of the window
 
 X find_ref_points(vector<int> line){
 
-    vector<int> object;
+    vector<Point> object;
+    Point p;
 
     X u;
     int max = 8000;
@@ -30,21 +31,24 @@ X find_ref_points(vector<int> line){
     //second point
     for (int i = 0; i < line.size(); i++){
         if (line[i] > max){
-            object.push_back(line[i]);
+            p.x = i%w;
+            p.y = i/w;
+            p.weight = line[i];
+            object.push_back(p);
         }
     }
 
     for (int i = 0; i < object.size(); i++){
-        t_x += object[i]*i%w;
-        t_y += object[i]*i/w;
-        b += object[i];
+        t_x += object[i].weight*object[i].x;
+        t_y += object[i].weight*object[i].y;
+        b += object[i].weight;
     }
     if (b != 0){
         u.x1 = t_x/b;
         u.y1 = t_y/b;
     } else {
-        u.x1 = 0;
-        u.y1 = 0;
+        u.x1 = -1;
+        u.y1 = -1;
     }
 
     //first point
@@ -60,11 +64,11 @@ X find_ref_points(vector<int> line){
         u.y0 = y;
         //third point
         for (int e = 0; e < object.size(); e++) {
-            d = sqrt((float)((e%w - u.x0)*(e%w - u.x0) + (e/w - u.y0)*(e/w - u.y0)));
+            d = sqrt((float)((object[e].x - u.x0)*(object[e].x - u.x0) + (object[e].y - u.y0)*(object[e].y - u.y0)));
             if (d > m_dist){
                 m_dist = d;
-                u.x2 = e%w;
-                u.y2 = e/w;
+                u.x2 = object[e].x;
+                u.y2 = object[e].y;
             }
         }
 

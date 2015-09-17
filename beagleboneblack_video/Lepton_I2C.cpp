@@ -108,7 +108,7 @@ void test(){
     if(!_connected) {
         lepton_connect();
     }*/
-    qDebug() << "ok";
+    qDebug() << lepton_get_temperature();
    // LEP_SetAgcHeqClipLimitLow(&_port, 1024);
    // LEP_SetAgcEnableState(&_port, LEP_AGC_ENABLE);
 

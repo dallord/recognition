@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'LeptonThread.h'
 **
-** Created: Wed Sep 16 11:36:41 2015
+** Created: Thu Sep 17 08:53:06 2015
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.2)
 **
 ** WARNING! All changes made in this file will be lost!

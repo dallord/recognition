@@ -191,6 +191,9 @@ void LeptonThread::run()
             color = qRgb(colormap[3*value], colormap[3*value+1], colormap[3*value+2]);
             column = (i % PACKET_SIZE_UINT16 ) - 2;
             row = i / PACKET_SIZE_UINT16;
+            if ((column == u.x0) && (row == u.y0)) color = qRgb(0, 0, 0);
+            if ((column == u.x1) && (row == u.y1)) color = qRgb(0, 0, 0);
+            if ((column == u.x2) && (row == u.y2)) color = qRgb(0, 0, 0);
             myImage.setPixel(column, row, color);
         }
 
