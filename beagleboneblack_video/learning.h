@@ -12,6 +12,8 @@
 
 #define K 4 //number of classes
 
+#define E 70 //epsilon - difference between minimal temperature and object temperature
+
 using namespace std;
 
 struct Point{ //object points

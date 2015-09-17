@@ -135,6 +135,7 @@ float rho(X u, X x_i){
                 + (u.x2 - x_i.x2)*(u.x2 - x_i.x2) + (u.y2 - x_i.y2)*(u.y2 - x_i.y2));
 }
 
+
 float algorithm(X u){
     int argmax = 0; //will return argument of maximum value
     float max = 0; //maximum value
