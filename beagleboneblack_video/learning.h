@@ -12,7 +12,10 @@
 
 #define K 4 //number of classes
 
-#define E 70 //epsilon - difference between minimal temperature and object temperature
+#define ENV_MIN 7900
+#define ENV_MAX 8050
+#define BODY_MIN 8100
+#define BODY_MAX 8300
 
 using namespace std;
 

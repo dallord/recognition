@@ -18,7 +18,7 @@ X find_ref_points(vector<int> line){
     Point p;
 
     X u;
-    int max = 8000;
+    int max = ENV_MAX;
     int x = 0, y = 0, w = 80;
 
     int t_x = 0;
@@ -28,17 +28,16 @@ X find_ref_points(vector<int> line){
     int d = 0;
     int m_dist = 0;
 
-    int min = 8000;
+    /*int min = ENV_MAX;
     for (int i = 0; i < line.size(); i++){
         if (line[i] < min){
             min = line[i];
         }
-    }
-    max = min + E;
+    }*/
 
     //second point
     for (int i = 0; i < line.size(); i++){
-        if (line[i] > max){
+        if ((line[i] > max) && (line[i] < BODY_MAX+50)){
             p.x = i%w;
             p.y = i/w;
             p.weight = line[i];
@@ -61,13 +60,13 @@ X find_ref_points(vector<int> line){
 
     //first point
     for (int i = 0; i < line.size(); i++){
-        if (line[i] > max){
+        if ((line[i] > max) && (line[i] < BODY_MAX+50)){
             max = line[i];
             x = i%w;
             y = i/w;
         }
     }
-    if (max != 8000){
+    if (max != ENV_MAX){
         u.x0 = x;
         u.y0 = y;
         //third point
@@ -139,8 +138,9 @@ float algorithm(X u){
     int argmax = 0; //will return argument of maximum value
     float max = 0; //maximum value
     int b; //true or false
+    float  dist;
 
-    float Margin = 0; //margin
+    //float Margin = 0; //margin
     for (int e = 0; e < K; e++){
         float sum = 0;
         for (int i = 0; i < counter_train; i++){
@@ -149,15 +149,16 @@ float algorithm(X u){
                     (training_out[i].s2 == classes[e].s2))
                 b = 1;
             else b = 0;
-            sum += b*gam[i]*(h/rho(u, training_in[i]));
+            dist = rho(u, training_in[i]);
+            sum += b*gam[i]*(h/dist);
         }
         //cout << sum << endl;
         if (sum > max){
             max = sum;
             argmax = e;
         }
-        Margin = sum - max;
-        cout << Margin << endl;
+       // Margin = sum - max;
+        //cout << Margin << endl;
     }
 
     return argmax;

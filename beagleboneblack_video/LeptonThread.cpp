@@ -171,14 +171,22 @@ void LeptonThread::run()
         }
 
 
-        //qDebug() << minValue <<  " "  << maxValue;
-        //minValue = 6000;
-        //maxValue = 9000;
+        //cout << minValue <<  " "  << maxValue << endl;
+
+        //---------------------------
+        //temperature correlation
+        //---------------------------
+        //7900-8050 - environment
+        //8100-8300 - body
+        //>8400 - hot objects
+        //---------------------------
 
         float diff;
-        if (minValue < 7860)
-            diff = 512;//maxValue - minValue;
-        else diff = 400;
+        if (minValue > 7900)
+            minValue = 7900;
+        if (maxValue < 8300)
+            maxValue = 8300;
+        diff = maxValue - minValue;
 
         float scale = 255/diff;
         QRgb color;
