@@ -64,7 +64,7 @@ void set_type(Y y); //set pointer to class
 
 float rho(X u, X x_i); //calculate distance
 
-float algorithm(X u);
+Y algorithm(X u);
 
 
 #endif // LEARNING_H

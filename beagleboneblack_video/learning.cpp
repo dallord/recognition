@@ -7,6 +7,7 @@ X* training_in; //list of training vectors - x_i
 Y* training_out; //list of training answers - y_i
 
 X learning_in; //learning point
+Y learning_out; //answers for learning point
 Y classes[K];
 
 float* gam; //array of gamma coefficients
@@ -28,16 +29,9 @@ X find_ref_points(vector<int> line){
     int d = 0;
     int m_dist = 0;
 
-    /*int min = ENV_MAX;
-    for (int i = 0; i < line.size(); i++){
-        if (line[i] < min){
-            min = line[i];
-        }
-    }*/
-
     //second point
     for (int i = 0; i < line.size(); i++){
-        if ((line[i] > max) && (line[i] < BODY_MAX+50)){
+        if ((line[i] > max) && (line[i] < BODY_MAX)){
             p.x = i%w;
             p.y = i/w;
             p.weight = line[i];
@@ -60,7 +54,7 @@ X find_ref_points(vector<int> line){
 
     //first point
     for (int i = 0; i < line.size(); i++){
-        if ((line[i] > max) && (line[i] < BODY_MAX+50)){
+        if ((line[i] > max) && (line[i] < BODY_MAX)){
             max = line[i];
             x = i%w;
             y = i/w;
@@ -134,13 +128,12 @@ float rho(X u, X x_i){
                 + (u.x2 - x_i.x2)*(u.x2 - x_i.x2) + (u.y2 - x_i.y2)*(u.y2 - x_i.y2));
 }
 
-float algorithm(X u){
+Y algorithm(X u){
     int argmax = 0; //will return argument of maximum value
     float max = 0; //maximum value
     int b; //true or false
     float  dist;
 
-    //float Margin = 0; //margin
     for (int e = 0; e < K; e++){
         float sum = 0;
         for (int i = 0; i < counter_train; i++){
@@ -150,24 +143,26 @@ float algorithm(X u){
                 b = 1;
             else b = 0;
             dist = rho(u, training_in[i]);
-            sum += b*gam[i]*(h/dist);
+            sum += b*gam[i]*(h/(dist + 1));
         }
         //cout << sum << endl;
+        if (e == 1) learning_out.s0 = sum;
+        if (e == 2) learning_out.s1 = sum;
+        if (e == 3) learning_out.s2 = sum;
         if (sum > max){
             max = sum;
             argmax = e;
         }
-       // Margin = sum - max;
-        //cout << Margin << endl;
     }
+    learning_out.type = argmax;
 
-    return argmax;
+    return learning_out;
 }
 
 void init_gamma(){
     for (int i = 0; i < counter_train; i++){
         gam[i] = 0;
-        if (algorithm(training_in[i]) != training_out[i].type)
+        if (algorithm(training_in[i]).type != training_out[i].type)
             gam[i] += 1;
     }
 }

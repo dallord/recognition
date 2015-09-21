@@ -149,10 +149,12 @@ void LeptonThread::run()
             learning_in = u;
 
             string classname;
+            Y ans;
             int A;
 
 
-            A = algorithm(learning_in);
+            ans = algorithm(learning_in);
+            A = ans.type;
             if (A == 0) classname = "no object";
             if (A == 1) classname = "standing";
             if (A == 2) classname = "sitting";
@@ -160,13 +162,14 @@ void LeptonThread::run()
             outfile << learning_in.x0 << " " << learning_in.y0 << " "
                     << learning_in.x1 << " " << learning_in.y1 << " "
                     << learning_in.x2 << " " << learning_in.y2 <<
-                       " = " << classname << endl;
+                       " = " << ans.s0 << " " << ans.s1 << " " << ans.s2 << endl;
 
 
             cout << learning_in.x0 << " " << learning_in.y0 << " "
                  << learning_in.x1 << " " << learning_in.y1 << " "
                  << learning_in.x2 << " " << learning_in.y2 <<
-                    " = " << classname << endl;
+                    " = "  << ans.s0 << " " << ans.s1 << " " << ans.s2 << " - "
+                    << classname << endl;
 
         }
 
