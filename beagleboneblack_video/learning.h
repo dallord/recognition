@@ -17,6 +17,8 @@
 #define BODY_MIN 8100
 #define BODY_MAX 8300
 
+#define EPSILON 0.05
+
 using namespace std;
 
 struct Point{ //object points
@@ -65,6 +67,8 @@ void set_type(Y y); //set pointer to class
 float rho(X u, X x_i); //calculate distance
 
 Y algorithm(X u);
+
+void learning_alg(X x, Y y, int e);
 
 
 #endif // LEARNING_H

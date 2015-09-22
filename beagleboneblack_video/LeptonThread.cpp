@@ -75,6 +75,9 @@ void LeptonThread::run()
     }
     infiletrain.close();
 
+    //for (int i = 0; i < counter_train; i++)
+        //learning_alg(training_in[1], training_out[1], 1);
+
    // test();
 
     while(true) {
