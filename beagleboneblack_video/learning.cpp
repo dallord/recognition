@@ -175,7 +175,11 @@ float Q(){ //empirical risk
 
 void init_gamma(){
     for (int i = 0; i < counter_train; i++){
-        gam[i] = 1;
+        gam[i] = 0;
+    }
+    for (int i = 0; i < counter_train; i++){
+        if (algorithm(training_in[i]).type != training_out[i].type)
+            gam[i]++;
     }
 
 }

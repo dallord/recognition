@@ -114,6 +114,8 @@ void LeptonThread::run()
         char buf[5];
         std::vector<int> line; //copy of frameBuffer to line
 
+        //if (counter%27 == 0)  out << "sec " << counter/27 <<": ";
+
 
         for(int i=0;i<FRAME_SIZE_UINT16;i++) {
             //skip the first 2 uint16_t's of every packet, they're 4 header bytes
