@@ -8,6 +8,11 @@
 
 using namespace std;
 
+#define ENV_MIN 7900
+#define ENV_MAX 8000
+#define BODY_MIN 8100
+#define BODY_MAX 8300
+
 int w = 80;
 int h = 60;
 
@@ -57,9 +62,9 @@ int main(int argc, char *argv[])
 
     vector<int> vct;
 
-    ifstream infile("../../data/outData.txt"); //open data-file
+    ifstream infile("../../data/experiments/test5.txt"); //open data-file
 
-    ofstream outfile("../../data/ref_points.txt"); //output file
+    ofstream outfile("../../data/experiments/test5_ref.txt"); //output file
     ofstream outobj("../../data/object.txt");
 
     if (infile.is_open()){
@@ -77,7 +82,7 @@ int main(int argc, char *argv[])
     infile.close();
 
     //count lines (number of seconds) in the file
-    infile.open("../../data/outData.txt");
+    infile.open("../../data/experiments/test5.txt");
     while (!infile.eof()){
         getline(infile, buff);
         counter++;
@@ -103,11 +108,11 @@ int main(int argc, char *argv[])
     int d;
     int m_dist; //maximum distance
     for (int j = 0; j < counter; j++){
-        max = 8000; //detect object
+        max = ENV_MAX; //detect object
         m_dist = 0;
         //second point
         for (int i = 0; i < vct.size()/counter; i++){
-            if (data[j][i] > max){
+            if ((data[j][i] > max) && (data[j][i] < BODY_MAX)){
                 p.weight = data[j][i];
                 p.coord.x = i%w;
                 p.coord.y = i/w;
@@ -121,13 +126,13 @@ int main(int argc, char *argv[])
 
         //first point
         for (int i = 0; i < vct.size()/counter; i++){
-            if (data[j][i] > max){
+            if ((data[j][i] > max) && (data[j][i] < BODY_MAX)){
                 max = data[j][i];
                 m.x = i%w;
                 m.y = i/w;
             }
         }
-        if (max != 8000){
+        if (max != ENV_MAX){
             //third point
             for (int e = 0; e < object.size(); e++) {
                 d = dist(m, object[e].coord);
@@ -138,12 +143,12 @@ int main(int argc, char *argv[])
                 }
             }
             cout << max << ": " << m.x << " " << m.y << "; " << c.x << " " << c.y << "; " << l.x << " " << l.y << endl;
-            outfile << m.x << " " << m.y << " " << c.x << " " << c.y << " " << l.x << " " << l.y<< "\n";
+            outfile << "sec " << j+1 << ": " << m.x << " " << m.y << " " << c.x << " " << c.y << " " << l.x << " " << l.y<< "\n";
 
         }
         else {
             cout << "no object" << endl;
-            outfile << "-1 -1 -1 -1 -1 -1\n";
+            outfile << "sec " << j+1 << ": " << "-1 -1 -1 -1 -1 -1\n";
         }
 
         object.clear();
