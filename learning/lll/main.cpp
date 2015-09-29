@@ -29,12 +29,18 @@ struct Y{ //otput vector of states
     int type;
 };
 
+struct Pair{
+    X training_in;
+    Y training_out;
+};
+
 int counter_train; //number of pairs in the training set - l
 int counter_learn;
 
 //training pairs
-X* training_in; //list of training vectors - x_i
-Y* training_out; //list of training answers - y_i
+//X* training_in; //list of training vectors - x_i
+//Y* training_out; //list of training answers - y_i
+Pair* training_set; //list of training pairs - x_i; y_i
 
 X* learning_in; //learning set
 Y classes[K];
@@ -82,12 +88,14 @@ void init_classes(){ //init array of existing classes
 }
 
 
-void set_type(Y y){
-    if ((y.s0 = 0) && (y.s1 = 0) && (y.s2 = 0) && (y.s3 = 0)) y.type = 0;
-    if ((y.s0 = 1) && (y.s1 = 0) && (y.s2 = 0) && (y.s3 = 0)) y.type = 1;
-    if ((y.s0 = 0) && (y.s1 = 1) && (y.s2 = 0) && (y.s3 = 0)) y.type = 2;
-    if ((y.s0 = 0) && (y.s1 = 0) && (y.s2 = 1) && (y.s3 = 0)) y.type = 3;
-    if ((y.s0 = 0) && (y.s1 = 0) && (y.s2 = 0) && (y.s3 = 1)) y.type = 4;
+int set_type(Y y){
+    int t = 0;
+    if ((y.s0 == 0) && (y.s1 == 0) && (y.s2 == 0) && (y.s3 == 0)) t = 0;
+    if ((y.s0 == 1) && (y.s1 == 0) && (y.s2 == 0) && (y.s3 == 0)) t = 1;
+    if ((y.s0 == 0) && (y.s1 == 1) && (y.s2 == 0) && (y.s3 == 0)) t = 2;
+    if ((y.s0 == 0) && (y.s1 == 0) && (y.s2 == 1) && (y.s3 == 0)) t = 3;
+    if ((y.s0 == 0) && (y.s1 == 0) && (y.s2 == 0) && (y.s3 == 1)) t = 4;
+    return t;
 }
 
 float rho(X u, X x_i){ //distance
@@ -117,34 +125,81 @@ void qsort(float rho[], int left, int right){
     if (l < right) qsort(rho, l, right);
 }
 
-float algorithm(X u){
-    int argmax = 0; //will return argument of maximum value
-    float max = 0; //maximum value
-    for (int e = 0; e < K; e++){
-        float sum = 0;
-        for (int i = 0; i < counter_train; i++){
-            if (    (training_out[i].s0 == classes[e].s0) &&
-                    (training_out[i].s1 == classes[e].s1) &&
-                    (training_out[i].s2 == classes[e].s2) &&
-                    (training_out[i].s3 == classes[e].s3))
-                sum += gam[i]*(h/(rho(u, training_in[i])+1.));
-        }
-        if (sum > max){
-            max = sum;
-            argmax = e;
+float Gamma(X u, Y y){
+    float sum = 0;
+    for (int i = 0; i < counter_train; i++){
+        if (training_set[i].training_out.type == y.type){
+            sum += gam[i]*(h/(rho(u, training_set[i].training_in) + 1.));
+       // cout << h << endl;
         }
     }
-    return argmax;
+   //cout <<  sum << endl;
+    return sum;
+}
+
+Y algorithm(X u){
+    Y result;
+    result.s0 = 0;
+    result.s1 = 0;
+    result.s2 = 0;
+    result.s3 = 0;
+
+    int argmax = 0; //will return argument of maximum value
+    float max = 0; //maximum value
+    float sum = 0;
+
+    for (int e = 0; e < K; e++){
+        sum = Gamma(u, classes[e]);
+        if (e == 1) result.s0 = sum;
+        if (e == 2) result.s1 = sum;
+        if (e == 3) result.s2 = sum;
+        if (e == 4) result.s3 = sum;
+        //cout << sum << endl;
+        if (sum >= max){
+            max = sum;
+            argmax = e;
+
+        }
+    }
+    result.type = argmax;
+    //cout << argmax << endl;
+
+    return result;
+}
+
+float Q(){ //empirical risk
+    float q = 0;
+    Y res;
+    for (int i = 0; i < counter_train; i++){
+        res = algorithm(training_set[i].training_in);
+        //cout << res.s0 << " " << res.s1 << " " << res.s2 << " " << res.s3 << endl;
+        q += sqrt((res.s0 - training_set[i].training_out.s0)*(res.s0 - training_set[i].training_out.s0) +
+                (res.s1 - training_set[i].training_out.s1)*(res.s1 - training_set[i].training_out.s1) +
+                (res.s2 - training_set[i].training_out.s2)*(res.s2 - training_set[i].training_out.s2) +
+                (res.s3 - training_set[i].training_out.s3)*(res.s3 - training_set[i].training_out.s3));
+    }
+    return q/(float)counter_train;
 }
 
 void init_gamma(){
     gam = new float[counter_train];
     for (int i = 0; i < counter_train; i++){
-        gam[i] = 1;
-        //if (algorithm(training_in[i]) != training_out[i].type)
-         //   gam[i] += 1;
+        gam[i] = 0;
+
     }
+
+    float q = 1;
+   while (q > 0.5){
+       q = Q();
+       for (int i = 0; i < counter_train; i++){
+            if (algorithm(training_set[i].training_in).type != training_set[i].training_out.type)
+                gam[i] += 1;
+
+       }
+    cout << q << endl;
+   }
 }
+
 
 
 int main(int argc, char *argv[])
@@ -177,12 +232,7 @@ int main(int argc, char *argv[])
     counter_learn--;
 
     //init sets and coefficients
-    training_in = new X[counter_train];
-    training_out = new Y[counter_train];
-
-    //gam = new float[counter_train];
-    init_gamma();
-    h = 3;
+    training_set = new Pair[counter_train];
 
     learning_in = new X[counter_learn];
     init_classes();
@@ -194,13 +244,15 @@ int main(int argc, char *argv[])
     while(!infiletrain.eof()){
         getline(infiletrain, line);
         sscanf(line.c_str(), "%d %d %d %d %d %d %f %f %f %f",
-               &training_in[i].x0, &training_in[i].y0, &training_in[i].x1, &training_in[i].y1, &training_in[i].x2, &training_in[i].y2,
-               &training_out[i].s0, &training_out[i].s1, &training_out[i].s2, &training_out[i].s3);
-        set_type(training_out[i]);
+               &training_set[i].training_in.x0, &training_set[i].training_in.y0, &training_set[i].training_in.x1, &training_set[i].training_in.y1, &training_set[i].training_in.x2, &training_set[i].training_in.y2,
+               &training_set[i].training_out.s0, &training_set[i].training_out.s1, &training_set[i].training_out.s2, &training_set[i].training_out.s3);
+        training_set[i].training_out.type = set_type(training_set[i].training_out);
         i++;
     }
     infiletrain.close();
 
+    h = 3.;
+    init_gamma();
 
     infilelearn.open("../../data/experiments/test2_ref.txt");
     i = 0;
@@ -238,15 +290,15 @@ int main(int argc, char *argv[])
 
     string classname;
     int A[counter_learn];
-    for (int i = 0; i < counter_learn; i++){
-        A[i] = algorithm(learning_in[i]);
+   /* for (int i = 0; i < counter_learn; i++){
+        A[i] = algorithm(learning_in[i]).type;
         if (A[i] == 0) classname = "no object";
         if (A[i] == 1) classname = "standing";
         if (A[i] == 2) classname = "sitting";
         if (A[i] == 3) classname = "lying on the bed";
         if (A[i] == 4) classname = "lying on the floor";
         outfile << learning_in[i].x0 << " " << learning_in[i].y0 << " " << learning_in[i].x1 << " " << learning_in[i].y1 << " " << learning_in[i].x2 << " " << learning_in[i].y2 << " = " << classname << endl;
-    }
+    }*/
     outfile.close();
     cout << "Done" << endl;
 
