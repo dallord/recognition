@@ -20,9 +20,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::readpoints(){
     std::ifstream t0("../../data/experiments/test0_pairs.txt");
-    std::ifstream t1("../../data/experiments/test1_pairs.txt");
+    //std::ifstream t1("../../data/experiments/test1_pairs.txt");
     std::ifstream t2("../../data/experiments/test2_pairs.txt");
-    std::ifstream t3("../../data/experiments/test3_pairs.txt");
+    //std::ifstream t3("../../data/experiments/test3_pairs.txt");
     std::ifstream t4("../../data/experiments/test4_pairs.txt");
     std::ifstream t5("../../data/experiments/test5_pairs.txt");
 
@@ -33,21 +33,21 @@ void MainWindow::readpoints(){
         counter++;
     }
     t0.close();
-    while (!t1.eof()){
+   /* while (!t1.eof()){
         getline(t1, buff);
         counter++;
     }
-    t1.close();
+    t1.close();*/
     while (!t2.eof()){
         getline(t2, buff);
         counter++;
     }
     t2.close();
-    while (!t3.eof()){
+    /*while (!t3.eof()){
         getline(t3, buff);
         counter++;
     }
-    t3.close();
+    t3.close();*/
     while (!t4.eof()){
         getline(t4, buff);
         counter++;
@@ -65,9 +65,9 @@ void MainWindow::readpoints(){
     classes = new Y[counter];
 
     t0.open("../../data/experiments/test0_pairs.txt");
-    t1.open("../../data/experiments/test1_pairs.txt");
+    //t1.open("../../data/experiments/test1_pairs.txt");
     t2.open("../../data/experiments/test2_pairs.txt");
-    t3.open("../../data/experiments/test3_pairs.txt");
+    //t3.open("../../data/experiments/test3_pairs.txt");
     t4.open("../../data/experiments/test4_pairs.txt");
     t5.open("../../data/experiments/test5_pairs.txt");
 
@@ -82,14 +82,14 @@ void MainWindow::readpoints(){
         i++;
     }
     t0.close();
-    while(!t1.eof()){
+    /*while(!t1.eof()){
         getline(t1, line);
         sscanf(line.c_str(), "%d %d %d %d %d %d %f %f %f %f",
                &points[i].x0, &points[i].y0, &points[i].x1, &points[i].y1, &points[i].x2, &points[i].y2,
                &classes[i].s0, &classes[i].s1, &classes[i].s2, &classes[i].s3);
         i++;
     }
-    t1.close();
+    t1.close();*/
     while(!t2.eof()){
         getline(t2, line);
         sscanf(line.c_str(), "%d %d %d %d %d %d %f %f %f %f",
@@ -98,14 +98,14 @@ void MainWindow::readpoints(){
         i++;
     }
     t2.close();
-    while(!t3.eof()){
+    /*while(!t3.eof()){
         getline(t3, line);
         sscanf(line.c_str(), "%d %d %d %d %d %d %f %f %f %f",
                &points[i].x0, &points[i].y0, &points[i].x1, &points[i].y1, &points[i].x2, &points[i].y2,
                &classes[i].s0, &classes[i].s1, &classes[i].s2, &classes[i].s3);
         i++;
     }
-    t3.close();
+    t3.close();*/
     while(!t4.eof()){
         getline(t4, line);
         sscanf(line.c_str(), "%d %d %d %d %d %d %f %f %f %f",
@@ -182,6 +182,18 @@ void MainWindow::paintEvent(QPaintEvent *){
     QPoint po[counter];
     QPoint po1[counter];
     QPoint po2[counter];
+
+    //legend
+    p.setPen(Qt::yellow);
+    p.drawText(rect(), Qt::AlignBottom, "   standing\n\n\n\n");
+    p.setPen(Qt::green);
+    p.drawText(rect(), Qt::AlignBottom, "   sitting\n\n\n");
+    p.setPen(Qt::blue);
+    p.drawText(rect(), Qt::AlignBottom, "   lying on the bed\n\n");
+    p.setPen(Qt::red);
+    p.drawText(rect(), Qt::AlignBottom, "   lying on the floor\n");
+
+    ui->label_8->setText(QString::number(counter));
 
 
     for (int i = 0; i < counter; i++){
