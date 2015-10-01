@@ -184,11 +184,11 @@ float Q(){ //empirical risk
 void init_gamma(){
     gam = new float[counter_train];
     for (int i = 0; i < counter_train; i++){
-        gam[i] = 0;
+        gam[i] = 1;
 
     }
 
-    float q = 1;
+    /*float q = 1;
    while (q > 0.5){
        q = Q();
        for (int i = 0; i < counter_train; i++){
@@ -197,7 +197,7 @@ void init_gamma(){
 
        }
     cout << q << endl;
-   }
+   }*/
 }
 
 
@@ -207,10 +207,10 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
 
-    ifstream infilelearn("../../data/experiments/test2_ref.txt"); //open list of reference points for learning
-    ifstream infiletrain("../../data/experiments/test0_pairs.txt"); //open file with training set
+    ifstream infilelearn("../../data/experiments/learning_set.txt"); //open list of reference points for learning
+    ifstream infiletrain("../../data/experiments/training_set.txt"); //open file with training set
 
-    ofstream outfile("../../data/result.txt"); //output file
+    ofstream outfile("../../data/experiments/result.txt"); //output file
 
 
     //count number of training and learning vectors
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
     init_classes();
 
     //filling training and learning sets
-    infiletrain.open("../../data/experiments/test0_pairs.txt");
+    infiletrain.open("../../data/experiments/training_set.txt");
     string line;
     int i = 0;
     while(!infiletrain.eof()){
@@ -254,11 +254,11 @@ int main(int argc, char *argv[])
     h = 3.;
     init_gamma();
 
-    infilelearn.open("../../data/experiments/test2_ref.txt");
+    infilelearn.open("../../data/experiments/learning_set.txt");
     i = 0;
     while(!infilelearn.eof()){
         getline(infilelearn, line);
-        sscanf(line.c_str(), "%*s %*s %d %d %d %d %d %d",
+        sscanf(line.c_str(), "%d %d %d %d %d %d %*f %*f %*f %*f",
                &learning_in[i].x0, &learning_in[i].y0, &learning_in[i].x1, &learning_in[i].y1, &learning_in[i].x2, &learning_in[i].y2);
         i++;
     }
@@ -290,7 +290,7 @@ int main(int argc, char *argv[])
 
     string classname;
     int A[counter_learn];
-   /* for (int i = 0; i < counter_learn; i++){
+    for (int i = 0; i < counter_learn; i++){
         A[i] = algorithm(learning_in[i]).type;
         if (A[i] == 0) classname = "no object";
         if (A[i] == 1) classname = "standing";
@@ -298,7 +298,7 @@ int main(int argc, char *argv[])
         if (A[i] == 3) classname = "lying on the bed";
         if (A[i] == 4) classname = "lying on the floor";
         outfile << learning_in[i].x0 << " " << learning_in[i].y0 << " " << learning_in[i].x1 << " " << learning_in[i].y1 << " " << learning_in[i].x2 << " " << learning_in[i].y2 << " = " << classname << endl;
-    }*/
+    }
     outfile.close();
     cout << "Done" << endl;
 
