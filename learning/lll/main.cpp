@@ -43,6 +43,7 @@ int counter_learn;
 Pair* training_set; //list of training pairs - x_i; y_i
 
 X* learning_in; //learning set
+Y* check_out; //checking of answers
 Y classes[K];
 
 float** r; //array of distances
@@ -127,6 +128,7 @@ void qsort(float rho[], int left, int right){
 
 float Gamma(X u, Y y){
     float sum = 0;
+    float c = 0;
     for (int i = 0; i < counter_train; i++){
         if (training_set[i].training_out.type == y.type){
             sum += gam[i]*(h/(rho(u, training_set[i].training_in) + 1.));
@@ -150,10 +152,10 @@ Y algorithm(X u){
 
     for (int e = 0; e < K; e++){
         sum = Gamma(u, classes[e]);
-        if (e == 1) result.s0 = sum;
+        /*if (e == 1) result.s0 = sum;
         if (e == 2) result.s1 = sum;
         if (e == 3) result.s2 = sum;
-        if (e == 4) result.s3 = sum;
+        if (e == 4) result.s3 = sum;*/
         //cout << sum << endl;
         if (sum >= max){
             max = sum;
@@ -162,6 +164,10 @@ Y algorithm(X u){
         }
     }
     result.type = argmax;
+    if (result.type == 1) result.s0 = 1;
+    if (result.type == 2) result.s1 = 1;
+    if (result.type == 3) result.s2 = 1;
+    if (result.type == 4) result.s3 = 1;
     //cout << argmax << endl;
 
     return result;
@@ -172,7 +178,7 @@ float Q(){ //empirical risk
     Y res;
     for (int i = 0; i < counter_train; i++){
         res = algorithm(training_set[i].training_in);
-        //cout << res.s0 << " " << res.s1 << " " << res.s2 << " " << res.s3 << endl;
+       // cout << res.s0 << " " << res.s1 << " " << res.s2 << " " << res.s3 << endl;
         q += sqrt((res.s0 - training_set[i].training_out.s0)*(res.s0 - training_set[i].training_out.s0) +
                 (res.s1 - training_set[i].training_out.s1)*(res.s1 - training_set[i].training_out.s1) +
                 (res.s2 - training_set[i].training_out.s2)*(res.s2 - training_set[i].training_out.s2) +
@@ -181,23 +187,43 @@ float Q(){ //empirical risk
     return q/(float)counter_train;
 }
 
+float margin(Pair x_i){
+    float G1, G2;
+    float max = 0;
+    G1 = Gamma(x_i.training_in, x_i.training_out);
+    for (int i = 0; i < K; i++){
+        if (i != x_i.training_out.type){
+            G2 = Gamma(x_i.training_in, classes[i]);
+            if (G2 > max) max = G2;
+        }
+
+    }
+    return G1-G2;
+}
+
 void init_gamma(){
     gam = new float[counter_train];
     for (int i = 0; i < counter_train; i++){
-        gam[i] = 1;
+        gam[i] = 0;
 
     }
 
-    /*float q = 1;
-   while (q > 0.5){
+    float sum_m = 0;
+    float av_m = 1;
+    float q = 1;
+   while (q > 0.01){
        q = Q();
        for (int i = 0; i < counter_train; i++){
             if (algorithm(training_set[i].training_in).type != training_set[i].training_out.type)
                 gam[i] += 1;
-
+            //sum_m += margin(training_set[i]);
+           // cout << gam[i] << " ";
        }
-    cout << q << endl;
-   }*/
+       //av_m = sum_m/(float)counter_train;
+      // cout << endl;
+   // cout << av_m << endl;
+    //cout << q << endl;
+   }
 }
 
 
@@ -235,6 +261,7 @@ int main(int argc, char *argv[])
     training_set = new Pair[counter_train];
 
     learning_in = new X[counter_learn];
+    check_out = new Y[counter_learn];
     init_classes();
 
     //filling training and learning sets
@@ -254,12 +281,15 @@ int main(int argc, char *argv[])
     h = 3.;
     init_gamma();
 
+
     infilelearn.open("../../data/experiments/learning_set.txt");
     i = 0;
     while(!infilelearn.eof()){
         getline(infilelearn, line);
-        sscanf(line.c_str(), "%d %d %d %d %d %d %*f %*f %*f %*f",
-               &learning_in[i].x0, &learning_in[i].y0, &learning_in[i].x1, &learning_in[i].y1, &learning_in[i].x2, &learning_in[i].y2);
+        sscanf(line.c_str(), "%d %d %d %d %d %d %f %f %f %f",
+               &learning_in[i].x0, &learning_in[i].y0, &learning_in[i].x1, &learning_in[i].y1, &learning_in[i].x2, &learning_in[i].y2,
+                &check_out[i].s0, &check_out[i].s1, &check_out[i].s2, &check_out[i].s3);
+        check_out[i].type = set_type(check_out[i]);
         i++;
     }
     infilelearn.close();
@@ -297,7 +327,9 @@ int main(int argc, char *argv[])
         if (A[i] == 2) classname = "sitting";
         if (A[i] == 3) classname = "lying on the bed";
         if (A[i] == 4) classname = "lying on the floor";
-        outfile << learning_in[i].x0 << " " << learning_in[i].y0 << " " << learning_in[i].x1 << " " << learning_in[i].y1 << " " << learning_in[i].x2 << " " << learning_in[i].y2 << " = " << classname << endl;
+        outfile << learning_in[i].x0 << " " << learning_in[i].y0 << " " << learning_in[i].x1 << " " << learning_in[i].y1 << " " << learning_in[i].x2 << " " << learning_in[i].y2 << " = " << classname;
+        if (A[i] != check_out[i].type) outfile << " - not correct" << endl;
+        else outfile << endl;
     }
     outfile.close();
     cout << "Done" << endl;
