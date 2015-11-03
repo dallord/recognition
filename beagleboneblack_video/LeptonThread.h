@@ -8,6 +8,7 @@
 #include <QtCore>
 #include <QPixmap>
 #include <QImage>
+#include <QFileDialog>
 
 #include <fstream>
 
@@ -45,7 +46,6 @@ private:
 
   uint8_t result[PACKET_SIZE*PACKETS_PER_FRAME];
   uint16_t *frameBuffer;
-
 
 
 };

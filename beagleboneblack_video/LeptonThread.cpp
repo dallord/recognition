@@ -29,16 +29,16 @@ void LeptonThread::run()
     //open spi port
     SpiOpenPort(0);
 
-    ofstream out("../data/outData.txt");
+    ofstream out("../data/of_tests/test0.txt");
 
-    ofstream outfile("../data/result.txt"); //output file
+    //ofstream outfile("../data/result.txt"); //output file
 
     int counter = 0;
 
-    X u; //learning points
+    //X u; //learning points
 
     //count number of training vectors
-    ifstream infiletrain("../data/experiments/training_set.txt"); //open file with training set
+    /*ifstream infiletrain("../data/experiments/training_set.txt"); //open file with training set
     string buff;
     counter_train = 0;
     while (!infiletrain.eof()){
@@ -73,7 +73,7 @@ void LeptonThread::run()
     infiletrain.close();
 
     h = 3; //can be other
-    init_gamma();
+    init_gamma();*/
 
     while(true) {
 
@@ -107,9 +107,8 @@ void LeptonThread::run()
         uint16_t maxValue = 0;
 
         char buf[5];
-        std::vector<int> line; //copy of frameBuffer to line
+        //std::vector<int> line; //copy of frameBuffer to line
 
-        //if (counter%27 == 0)  out << "sec " << counter/27 <<": ";
 
 
         for(int i=0;i<FRAME_SIZE_UINT16;i++) {
@@ -133,16 +132,20 @@ void LeptonThread::run()
             column = i % PACKET_SIZE_UINT16 - 2;
             row = i / PACKET_SIZE_UINT16 ;
 
-            if (counter%27 == 0){
+            if (counter%9 == 0){
                 sprintf(buf, "%u", frameBuffer[i]);
-                out << buf << " ";
+                out << (int)(frameBuffer[i]) << " ";
 
-                line.push_back((int)frameBuffer[i]);
+
+                //line.push_back((int)frameBuffer[i]);
             }
         }
 
-        if (counter%27 == 0){ //handling the line
+
+        if (counter%9 == 0){ //handling the line
             out << "\n";
+
+           /* cout << minValue << " " << maxValue << endl;
 
             u = find_ref_points(line);
 
@@ -163,19 +166,17 @@ void LeptonThread::run()
             outfile << learning_in.x0 << " " << learning_in.y0 << " "
                     << learning_in.x1 << " " << learning_in.y1 << " "
                     << learning_in.x2 << " " << learning_in.y2 <<
-                       " = " << ans.s0 << " " << ans.s1 << " " << ans.s2 << " " << ans.s3 << endl;
+                       " = " << ans.s0 << " " << ans.s1 << " " << ans.s2 << " " << ans.s3 << endl;*/
 
 
-            cout << learning_in.x0 << " " << learning_in.y0 << " "
+           /* cout << learning_in.x0 << " " << learning_in.y0 << " "
                  << learning_in.x1 << " " << learning_in.y1 << " "
                  << learning_in.x2 << " " << learning_in.y2 <<
                     " = "  << ans.s0 << " " << ans.s1 << " " << ans.s2 << " " << ans.s3 << " - "
-                    << classname << endl;
+                    << classname << endl;*/
 
         }
 
-
-        //cout << minValue <<  " "  << maxValue << endl;
 
         //---------------------------
         //temperature correlation
@@ -203,21 +204,21 @@ void LeptonThread::run()
             color = qRgb(colormap[3*value], colormap[3*value+1], colormap[3*value+2]);
             column = (i % PACKET_SIZE_UINT16 ) - 2;
             row = i / PACKET_SIZE_UINT16;
-            if ((column == u.x0) && (row == u.y0)) color = qRgb(0, 0, 0);
+            /*if ((column == u.x0) && (row == u.y0)) color = qRgb(0, 0, 0);
             if ((column == u.x1) && (row == u.y1)) color = qRgb(0, 0, 0);
-            if ((column == u.x2) && (row == u.y2)) color = qRgb(0, 0, 0);
+            if ((column == u.x2) && (row == u.y2)) color = qRgb(0, 0, 0);*/
             myImage.setPixel(column, row, color);
         }
 
         //lets emit the signal for update
         emit updateImage(myImage);
         counter++;
-        line.clear();
+        //line.clear();
 
 
     }
     out.close();
-    outfile.close();
+    //outfile.close();
 
     //finally, close SPI port just bcuz
     SpiClosePort(0);
@@ -231,3 +232,4 @@ void LeptonThread::performFFC() {
 void LeptonThread::Test(){
     test();
 }
+

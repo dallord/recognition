@@ -50,6 +50,8 @@ float** r; //array of distances
 float* gam; //array of gamma coefficients
 float h; //width of the window
 
+float p; //probability
+
 void init_classes(){ //init array of existing classes
 
     //"no object"
@@ -128,14 +130,17 @@ void qsort(float rho[], int left, int right){
 
 float Gamma(X u, Y y){
     float sum = 0;
-    float c = 0;
+    p = 0;
     for (int i = 0; i < counter_train; i++){
         if (training_set[i].training_out.type == y.type){
             sum += gam[i]*(h/(rho(u, training_set[i].training_in) + 1.));
+            p++;
        // cout << h << endl;
         }
     }
    //cout <<  sum << endl;
+    p = p/(float)counter_train;
+    //cout << p << endl;
     return sum;
 }
 

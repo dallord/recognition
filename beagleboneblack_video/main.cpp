@@ -5,6 +5,7 @@
 
 #include <QColor>
 #include <QLabel>
+#include <QTextEdit>
 #include <QtDebug>
 #include <QString>
 #include <QPushButton>
@@ -18,7 +19,7 @@ int main( int argc, char **argv )
 	QApplication a( argc, argv );
 	
 	QWidget *myWidget = new QWidget;
-	myWidget->setGeometry(400, 300, 340, 290);
+    myWidget->setGeometry(400, 300, 340, 290);
 
 	//create an image placeholder for myLabel
 	//fill the top left corner with red, just bcuz
@@ -33,16 +34,21 @@ int main( int argc, char **argv )
 
 	//create a label, and set it's image to the placeholder
 	MyLabel myLabel(myWidget);
-	myLabel.setGeometry(10, 10, 320, 240);
+    myLabel.setGeometry(10, 10, 320, 240);
 	myLabel.setPixmap(QPixmap::fromImage(myImage));
 
-	//create a FFC button
-	QPushButton *button1 = new QPushButton("Perform FFC", myWidget);
-    button1->setGeometry(320/2-120, 290-35, 100, 30);
+    //create a save button and label
+    //QPushButton *button1 = new QPushButton("Save", myWidget);
+    //button1->setGeometry(320/2-120, 290-35, 100, 30);
+    /*QTextEdit *fname =  new QTextEdit("test0",myWidget);
+    fname->setGeometry(320/2-120, 290-35, 100, 30);
 
-    //create a test button
-    QPushButton *button2 = new QPushButton("Test", myWidget);
-    button2->setGeometry(320/2+20, 290-35, 100, 30);
+    //create a start button
+    QPushButton *button2 = new QPushButton("Start", myWidget);
+    button2->setGeometry(320/2+10, 290-35, 50, 30);
+    //create a stop button
+    QPushButton *button3 = new QPushButton("Stop", myWidget);
+    button3->setGeometry(320/2+80, 290-35, 50, 30);*/
 
 
 
@@ -50,12 +56,11 @@ int main( int argc, char **argv )
 	//when the thread emits updateImage, the label should update its image accordingly
 	LeptonThread *thread = new LeptonThread();
 	QObject::connect(thread, SIGNAL(updateImage(QImage)), &myLabel, SLOT(setImage(QImage)));
-	
-	//connect ffc button to the thread's ffc action
-	QObject::connect(button1, SIGNAL(clicked()), thread, SLOT(performFFC()));
-	thread->start();
 
-    QObject::connect(button2, SIGNAL(clicked()), thread, SLOT(Test()));
+    thread->start();
+
+    //QObject::connect(button2, SIGNAL(clicked()), thread, SLOT(start()));
+    //QObject::connect(button3, SIGNAL(clicked()), thread, SLOT(Test()));
 	
 	myWidget->show();
 

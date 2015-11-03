@@ -24,6 +24,7 @@ struct X{
 struct Point{
     X coord;
     int weight;
+    bool ob; //object or not
 };
 
 X find_center_mass(vector<Point> obj){
@@ -62,9 +63,9 @@ int main(int argc, char *argv[])
 
     vector<int> vct;
 
-    ifstream infile("../../data/experiments/test5.txt"); //open data-file
+    ifstream infile("../../data/experiments/test0.txt"); //open data-file
 
-    ofstream outfile("../../data/experiments/test5_ref.txt"); //output file
+    //ofstream outfile("../../data/experiments/test5_ref.txt"); //output file
     ofstream outobj("../../data/object.txt");
 
     if (infile.is_open()){
@@ -82,7 +83,7 @@ int main(int argc, char *argv[])
     infile.close();
 
     //count lines (number of seconds) in the file
-    infile.open("../../data/experiments/test5.txt");
+    infile.open("../../data/experiments/test0.txt");
     while (!infile.eof()){
         getline(infile, buff);
         counter++;
@@ -90,14 +91,18 @@ int main(int argc, char *argv[])
     infile.close();
 
 
-    vector<int> data[counter]; //data array
-    vector<Point> object; //points of the object
+    vector<Point> data[counter]; //data array
+   // vector<Point> object; //points of the object
     Point p;
     X c;//center of the mass
 
     for (int j = 0; j < counter; j++){
         for(int i = 0; i < vct.size()/counter; i++){
-            data[j].push_back(vct[j*vct.size()/counter+i]);
+            p.weight = vct[j*vct.size()/counter+i];
+            p.coord.x = i%w;
+            p.coord.y = i/w;
+            p.ob = false;
+            data[j].push_back(p);
         }
     }
 
@@ -107,25 +112,32 @@ int main(int argc, char *argv[])
     X l; //legs
     int d;
     int m_dist; //maximum distance
-    for (int j = 0; j < counter; j++){
-        max = ENV_MAX; //detect object
-        m_dist = 0;
+    for (int j = 1; j < counter; j++){
+        //max = ENV_MAX; //detect object
+        //m_dist = 0;
+        cout << j << ": ";
         //second point
         for (int i = 0; i < vct.size()/counter; i++){
-            if ((data[j][i] > max) && (data[j][i] < BODY_MAX)){
-                p.weight = data[j][i];
-                p.coord.x = i%w;
-                p.coord.y = i/w;
-                object.push_back(p);
-                outobj << p.coord.x << " " << p.coord.y << ": " << p.weight << " ";
+            if (data[j][i].weight - data[j-1][i].weight > 100){
+            //if ((data[j][i] > max) && (data[j][i] < BODY_MAX)){
+                cout << data[j][i].weight - data[j-1][i].weight << " ";
+                data[j][i].ob = true;
+            }
+            if (data[j][i].weight - data[j-1][i].weight < -100){
+                data[j][i].ob = false;
             }
 
         }
-        c = find_center_mass(object);
+        for (int e = 0; e < vct.size()/counter; e++){
+            if (data[j][e].ob == true)
+                outobj << data[j][e].coord.x << " " << data[j][e].coord.y << ": " << data[j][e].weight << " ";
+        }
+        //c = find_center_mass(object);
+        cout << endl;
         outobj << endl;
 
         //first point
-        for (int i = 0; i < vct.size()/counter; i++){
+        /*for (int i = 0; i < vct.size()/counter; i++){
             if ((data[j][i] > max) && (data[j][i] < BODY_MAX)){
                 max = data[j][i];
                 m.x = i%w;
@@ -149,12 +161,13 @@ int main(int argc, char *argv[])
         else {
             cout << "no object" << endl;
             outfile << "sec " << j+1 << ": " << "-1 -1 -1 -1 -1 -1\n";
-        }
+        }*/
 
-        object.clear();
+        //object.clear();
     }
-    outfile.close();
+    //outfile.close();
     outobj.close();
+    cout << "done" << endl;
 
 
     return a.exec();
